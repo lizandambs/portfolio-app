@@ -16,10 +16,14 @@ jobs:
          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/ciportofolio .
+        run: |
+         docker build -t ${{ secrets.DOCKER_USERNAME }}/ciportofolio:${{ github.run_number }} .
+         docker build -t ${{ secrets.DOCKER_USERNAME }}/ciportofolio .
 
       - name: Push image to registry
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/ciportofolio   
+        run: |
+            docker push ${{ secrets.DOCKER_USERNAME }}/ciportofolio
+            docker push ${{ secrets.DOCKER_USERNAME }}/ciportofolio:${{ github.run_number }}   
 
     
 
