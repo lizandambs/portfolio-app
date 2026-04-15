@@ -10,34 +10,32 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Docker login
-        uses: docker/login-action@v4
+        uses: docker/login-action@v3        # ✅ FIXED: v4 doesn't exist, latest is v3
         with:
-         username: ${{ secrets.DOCKER_USERNAME }}
-         password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build image
         run: |
-         docker build -t ${{ secrets.DOCKER_USERNAME }}/ciportofolio:${{ github.run_number }} .
-         docker build -t ${{ secrets.DOCKER_USERNAME }}/ciportofolio .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/ciportofolio:${{ github.run_number }} .
+          docker build -t ${{ secrets.DOCKER_USERNAME }}/ciportofolio:latest .   # ✅ FIXED: added :latest tag
 
       - name: Push image to registry
         run: |
-            docker push ${{ secrets.DOCKER_USERNAME }}/ciportofolio
-            docker push ${{ secrets.DOCKER_USERNAME }}/ciportofolio:${{ github.run_number }}   
+          docker push ${{ secrets.DOCKER_USERNAME }}/ciportofolio:latest         # ✅ FIXED: added :latest tag
+          docker push ${{ secrets.DOCKER_USERNAME }}/ciportofolio:${{ github.run_number }}
 
   deploy:
     needs: build
-    runs on: ubuntu-latest
-steps:
-    - name: SSh to linux and run container
-      uses: appleboy/ssh-action@v1
-    with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.PRIVATE_KEY }}
-        #port: ${{ secrets.PORT }}
-        script: |
+    runs-on: ubuntu-latest                  # ✅ FIXED: was "runs on" (missing hyphen), also wrong indentation
+    steps:
+      - name: SSH to linux and run container
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.PRIVATE_KEY }}
+          script: |
             docker rm -f portfolio || echo "container not found, skipping removal"
-            docker run -d --name portfolio -p 8080:80 docker push ${{ secrets.DOCKER_USERNAME }}/ciportofolio
-
- 
+            docker pull ${{ secrets.DOCKER_USERNAME }}/ciportofolio:latest       # ✅ ADDED: pull before run
+            docker run -d --name portfolio -p 8080:80 ${{ secrets.DOCKER_USERNAME }}/ciportofolio:latest  # ✅ FIXED: removed stray "docker push" keyword
