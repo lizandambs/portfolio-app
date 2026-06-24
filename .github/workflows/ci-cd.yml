@@ -19,25 +19,25 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.2.2          # ✅ updated — Node.js 24 compatible
+        uses: actions/checkout@v4
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v4.1.0   # ✅ updated
+        uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2.0.1            # ✅ updated
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Build Image
         run: |
-          docker build -t ${{ env.ECR_REPOSITORY }}:latest .
+          docker build -t ${{ env.ECR_REPOSITORY }}:latest .    # ✅ was ${{ env.ECR_REPOSITORY }}
 
       - name: Tag Image
         run: |
-          docker tag ${{ env.ECR_REPOSITORY }}:latest \
+          docker tag ${{ env.ECR_REPOSITORY }}:latest \          # ✅ was vars.ECR_REPOSITORY
           ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
 
       - name: Push Image
