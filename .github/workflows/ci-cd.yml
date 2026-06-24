@@ -33,11 +33,11 @@ jobs:
 
       - name: Build Image
         run: |
-          docker build -t ${{ env.ECR_REPOSITORY }}:latest .    # ✅ was ${{ env.ECR_REPOSITORY }}
+          docker build -t ${{ env.ECR_REPOSITORY }}:latest .
 
       - name: Tag Image
         run: |
-          docker tag ${{ env.ECR_REPOSITORY }}:latest \          # ✅ was vars.ECR_REPOSITORY
+          docker tag ${{ env.ECR_REPOSITORY }}:latest \
           ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
 
       - name: Push Image
