@@ -33,14 +33,14 @@ jobs:
 
       - name: Build Image
         run: |
-          docker build -t ${{ vars.ECR_REPOSITORY }} .
+          docker build -t ${{ env.ECR_REPOSITORY }}:latest .
 
       - name: Tag Image
         run: |
-          docker tag ${{ vars.ECR_REPOSITORY }}:latest \
-          ${{ steps.login-ecr.outputs.registry }}/${{ ECR_REPOSITORY }}:latest
+          docker tag ${{ env.ECR_REPOSITORY }}:latest \
+          ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
 
       - name: Push Image
         run: |
           docker push \
-          ${{ steps.login-ecr.outputs.registry }}/${{ vars.ECR_REPOSITORY }}:latest
+          ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:latest
